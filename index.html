@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HALL 1 - Scan QR</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d0d0d;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ff99;
+      margin-bottom: 10px;
+    }
+    video {
+      width: 90%;
+      max-width: 500px;
+      border: 2px solid #333;
+      border-radius: 10px;
+    }
+    canvas {
+      display: none;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #00ffcc;
+    }
+    .status-box {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #1a1a1a;
+      border-radius: 10px;
+      display: inline-block;
+      min-width: 250px;
+    }
+  </style>
+</head>
+<body>
+  <h1>HALL 1</h1>
+  <video id="video" autoplay></video>
+  <canvas id="canvas"></canvas>
+  <div id="result">Arahkan QR ke kamera...</div>
+  <div class="status-box" id="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const result = document.getElementById('result');
+    const statusBox = document.getElementById('status');
+    const ctx = canvas.getContext('2d');
+    let lastCode = null;
+
+    // Minta izin akses kamera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => {
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true);
+        requestAnimationFrame(scanFrame);
+      })
+      .catch(err => {
+        result.textContent = "Gagal mengakses kamera: " + err;
+      });
+
+    function scanFrame() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+        if (code && code.data !== lastCode) {
+          lastCode = code.data;
+          result.textContent = "QR Terdeteksi ✅";
+          statusBox.textContent = "Isi QR: " + code.data;
+        }
+      }
+      requestAnimationFrame(scanFrame);
+    }
+  </script>
+</body>
+</html>
