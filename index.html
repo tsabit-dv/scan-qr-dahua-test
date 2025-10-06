@@ -57,7 +57,7 @@
     const ctx = canvas.getContext('2d');
     let lastCode = null;
 
-    // Minta izin akses kamera
+    // Minta akses kamera
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
       .then(stream => {
         video.srcObject = stream;
@@ -67,6 +67,14 @@
       .catch(err => {
         result.textContent = "Gagal mengakses kamera: " + err;
       });
+
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = "id-ID"; // gunakan bahasa Indonesia
+      msg.rate = 1;       // kecepatan normal
+      speechSynthesis.cancel(); // hentikan suara sebelumnya
+      speechSynthesis.speak(msg);
+    }
 
     function scanFrame() {
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -81,6 +89,17 @@
           lastCode = code.data;
           result.textContent = "QR Terdeteksi ✅";
           statusBox.textContent = "Isi QR: " + code.data;
+
+          // Coba parsing isi JSON (jika QR dibuat dari generate.html)
+          try {
+            const data = JSON.parse(code.data);
+            const nama = data.nama || "Tidak diketahui";
+            const pekerjaan = data.pekerjaan || "Tidak diketahui";
+            speak(`Nama: ${nama}. Pekerjaan: ${pekerjaan}.`);
+          } catch {
+            // Kalau QR bukan JSON, baca langsung teksnya
+            speak("QR berisi: " + code.data);
+          }
         }
       }
       requestAnimationFrame(scanFrame);
