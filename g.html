@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generate QR - Hall 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d0d0d;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ff99;
+      margin-bottom: 10px;
+    }
+    form {
+      background-color: #1a1a1a;
+      display: inline-block;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: none;
+      background-color: #333;
+      color: #fff;
+    }
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #00ff99;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #qrcode {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Generate QR - HALL 1</h1>
+
+  <form id="qrForm">
+    <label for="nama">Nama:</label>
+    <input type="text" id="nama" required placeholder="Masukkan nama anda">
+
+    <label for="pekerjaan">Pekerjaan:</label>
+    <input type="text" id="pekerjaan" required placeholder="Masukkan pekerjaan anda">
+
+    <button type="submit">Buat QR</button>
+  </form>
+
+  <div id="qrcode"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script>
+    const form = document.getElementById("qrForm");
+    const qrContainer = document.getElementById("qrcode");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      qrContainer.innerHTML = ""; // bersihkan QR sebelumnya
+
+      const nama = document.getElementById("nama").value.trim();
+      const pekerjaan = document.getElementById("pekerjaan").value.trim();
+
+      if (!nama || !pekerjaan) {
+        alert("Isi nama dan pekerjaan terlebih dahulu!");
+        return;
+      }
+
+      const data = JSON.stringify({ nama, pekerjaan });
+      new QRCode(qrContainer, {
+        text: data,
+        width: 200,
+        height: 200,
+        colorDark: "#00ff99",
+        colorLight: "#0d0d0d",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    });
+  </script>
+</body>
+</html>
